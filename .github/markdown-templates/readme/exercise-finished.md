@@ -3,7 +3,7 @@
 # 🎉 Congratulations {{ login }}! 🎉
 
 <!-- Replace alt text and image name to use the correct module. -->
-<img alt="badge module 8/11 complete" src="../../images/badge-module-08.png" height="200px" />
+<img alt="badge module 8/11 complete" src="https://github.com/markoniemi/mcp-demo/blob/main/.github/images/badge-module-08.png?raw=true" height="200px" />
 
 ### 🌟 You've successfully completed the exercise! 🌟
 
