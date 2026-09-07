@@ -1,7 +1,7 @@
 # MCP Presentation Plan: When to Use MCPs vs. CLIs
 
 **Audience:** Developers using Cline (React + Spring Boot + Robot Framework + ArangoDB stack)  
-**Duration:** 60 minutes  
+**Duration:** 50 minutes  
 **Goal:** Adopt local MCPs in Cline after security team approval by showing what MCPs enable (direct tool access) and why the approval cost is worth it  
 **Note:** Installation details are out of scope — this presentation focuses on value proposition, not setup
 
@@ -13,7 +13,7 @@
 |---------|------|------|
 | 1. Opening: What We're Exploring | 2 min | Talk |
 | 2. What is an MCP? | 5 min | Slides + Explanation |
-| 3. Why MCPs Matter for Claude | 12 min | Slides + Explanation |
+| 3. Which MCPs We're Requesting | 2 min | Slides |
 | 4. Demo 1: Playwright MCP | 12 min | Live Demo |
 | 5. Demo 2: rf-mcp | 12 min | Live Demo |
 | 6. When CLI is Enough | 5 min | Honest Assessment |
@@ -25,16 +25,16 @@
 ## Section 1: Opening (2 minutes)
 
 ### Goal
-Introduce the core question: Claude can help with your tools in two ways. Which is better?
+Introduce the core question: Cline can help with your tools in two ways. Which is better?
 
 ### Script
 > "You use Cline to help with coding, testing, debugging. But here's the question: how does Cline access your tools? Two ways:
 > 
-> **One:** You tell Cline 'run this playwright test,' Cline executes it in a terminal, returns the output. You manage the handoff between Cline and the tool.
+> **One:** You tell Cline 'run this playwright test,' Cline executes it in a terminal, parses raw text output — potentially 1000 lines of logs, noise, and formatting. Cline has to read and extract the signal from all that.
 > 
-> **Two:** Cline has direct access via MCP. It runs the tool, sees results, integrates them into suggestions — seamlessly, within Cline.
+> **Two:** Cline has direct access via MCP. It runs the tool, gets back concise, structured JSON. No parsing. Just clean data to reason about.
 > 
-> Which is better? That's what we're exploring today. Spoiler: MCPs are smoother. The catch: they need security approval because they're new interfaces. But the payoff is worth it. So we're asking: which tools are worth that approval cost?"
+> That's the difference. MCPs make your AI development loop more reliable and much faster — Cline doesn't have to guess the right Windows or Linux command, doesn't waste time parsing noise, just acts directly on clean data."
 
 ### Slides
 - Title: "Cline + Your Development Tools"
@@ -57,7 +57,7 @@ Define MCP clearly. Show the difference between local and remote MCPs. Establish
 >
 > **Remote MCPs** — Run in the cloud. Example: Cline connects to a remote service to fetch data. Disadvantage: your data leaves your machine. Your security team will want to audit where data goes.
 >
-> **Local MCPs** — Run on your machine. Example: Cline runs Playwright tests on your laptop using the Playwright MCP. Advantage: your code and data stay local. Your database stays on your machine. Security team's main concern is what the MCP code does, not where data travels.
+> **Local MCPs** — Run on your machine. Example: Cline runs Playwright tests on your laptop using the Playwright MCP. Advantage: your code and data stay local. Your database stays on your machine. Security team's main concern is what the MCP code does, not where data travels. Technically, Cline spawns the MCP as a child process and communicates with it via stdio — it's not a server. Just a lightweight subprocess that handles the tool call and returns the result.
 >
 > **That's why we're focusing on local MCPs.** Your testing, your code, your databases — all stay local. Security can audit the code, approve it, and you're good to go."
 
@@ -94,52 +94,38 @@ Data stays local ✓
 
 ---
 
-## Section 3: Why MCPs Matter for Cline (12 minutes)
+## Section 3: Which MCPs We're Requesting (2 minutes)
 
 ### Goal
-Show what MCPs enable and why they're worth the security approval cost.
+List the specific MCPs we're asking security to approve and their purpose.
 
 ### Script
-> "MCPs give Cline **direct, seamless access** to your tools. Here's why that matters:
-> 
-> **Without MCP:** You tell Cline 'run this test,' Cline executes a command, gets output, returns it to you. Cline sees raw text. You have to interpret it and decide what to do.
+> "We're asking security to approve six local MCPs:
 >
-> **With MCP:** Cline runs the tool *and understands the results*. Test fails? Cline analyzes the failure, understands what went wrong, and suggests the fix — right in your editor. Cline interprets it for you; you don't read raw output.
+> **Maven MCP** — Run tests, compile, and manage the full build lifecycle. Get structured results instead of parsing verbose output.
 >
-> Now, the catch: **MCPs are new software**. They're connections between Cline and your infrastructure. Security needs to review them. Regular CLI tools don't need approval because they're already installed as dev dependencies.
+> **JUnit MCP** — Direct access to test execution and failure analysis. Cline understands exactly which assertions failed and why.
 >
-> So the real question: **Is the seamless experience worth asking security to approve new interfaces?** We think so, for the tools that matter most to your workflow. Let's show you what that looks like."
+> **Vitest MCP** — Run frontend tests, get clean JSON results. Same tight feedback loop as Maven.
+>
+> **Playwright MCP** — Write and debug e2e tests seamlessly in Cline.
+>
+> **rf-mcp** — Cline understands Robot Framework test failures and suggests fixes.
+>
+> **context7** — Fetch current documentation without leaving your editor.
+>
+> All six are local, auditable, and work everywhere — VS Code, IntelliJ, CLI."
 
-### Slides (4 slides)
+### Slides (1 slide)
 
-**Slide 1: Terminal vs MCP Access Model**
-```
-Terminal Path:
-Cline → "Run test" → Terminal → Output → You interpret
-
-MCP Path:
-Cline → Direct Access → Runs tool → Understands results → Suggests fix
-```
-
-**Slide 2: What's Different?**
-- Terminal: Cline gives you information; you reason about it
-- MCP: Cline acts and interprets; you review suggestion
-- Result: Faster feedback loops, Cline does the reasoning
-
-**Slide 3: The Security Trade-off**
-- **CLI tools:** Already approved as dev dependencies. No new review needed.
-- **MCPs:** New interfaces between Cline and your tools. Security reviews them once. Worth it because of better integration across your IDEs.
-
-**Slide 4: Which MCPs We're Asking For**
-- Playwright MCP (write/debug tests seamlessly in Cline)
-- rf-mcp (Cline understands Robot Framework test failures)
-- context7 (fetch current docs without leaving your editor)
-- All local, all auditable, all work everywhere (VS Code, IntelliJ, CLI)
-
-### Key Talking Points
-- "MCPs aren't about replacing terminal tools — it's about how Cline helps you *use* your tools better."
-- "Terminal is fine if you like manual handoffs. MCP is smoother if you want Cline to do more of the reasoning."
-- "Security approval is real, but these are solid, documented tools worth that cost. One approval works everywhere."
+**Slide: Which MCPs We're Requesting**
+- Maven MCP — Build and test lifecycle, structured results
+- JUnit MCP — Test execution and failure analysis
+- Vitest MCP — Run frontend tests, get clean JSON output
+- Playwright MCP — E2E test writing and debugging
+- rf-mcp — Robot Framework test analysis
+- context7 — Documentation lookup in-IDE
+- All local, auditable, cross-IDE compatible
 
 ---
 
@@ -152,9 +138,10 @@ Show what Playwright MCP enables: Cline runs e2e tests against a live applicatio
 Run e2e tests from the `e2e/` directory against the app in `src/`, and ask Cline to spot errors in the application based on test behavior.
 
 ### Pre-Demo Setup Checklist
-- [ ] **Application started** — `npm start` or your dev server running on localhost (e.g., http://localhost:3000)
+- [ ] **Application started** — `npm run dev` running on http://localhost:5173
 - [ ] Cline open with Playwright MCP configured
-- [ ] E2E test files exist in `e2e/` directory (e.g., `e2e/example.spec.ts`)
+- [ ] E2E test files exist in `e2e/` directory
+- [ ] Ready to run `npm run test:e2e` via Playwright MCP
 - [ ] Backup screenshots: test running, passing/failing output, Cline's error analysis
 - [ ] **Note:** Installation details are not demoed — assume MCPs are already set up
 
@@ -165,10 +152,10 @@ Run e2e tests from the `e2e/` directory against the app in `src/`, and ask Cline
 - Say: "We have a running application and a suite of e2e tests. With Playwright MCP, Cline can run these tests, see the interactions, and spot bugs in our app. Let's see what it finds."
 
 **2. Cline runs e2e tests via Playwright MCP (4 min)**
-- Prompt Cline: "Run the e2e tests in the `e2e/` directory. Show me the test output and what interactions the app is performing."
+- Prompt Cline: "Use Playwright MCP to run e2e tests."
 - Cline executes the tests via Playwright MCP (direct access)
 - Show test output: which tests passed, which failed, browser interactions logged
-- Say: "Cline ran all the tests and got the full output. It can see exactly what the app did during each interaction."
+- Say: "Cline ran all the tests against localhost:5173 and got the full output. It can see exactly what the app did during each interaction."
 
 **3. Ask Cline to spot app errors (6 min)**
 - Prompt Cline: "Look at the test output and the app interactions. Can you identify any bugs or unexpected behavior in the application? What should the app be doing differently?"
@@ -216,6 +203,7 @@ Show how Cline can convert Playwright tests to Robot Framework tests, run them v
 Take a Playwright test, convert it to Robot Framework using Cline + rf-mcp, run it, and review best practices.
 
 ### Pre-Demo Setup Checklist
+- [ ] **Application started** — `npm run dev` running on http://localhost:5173
 - [ ] Playwright test generated from Demo 1 (or sample Playwright test ready)
 - [ ] rf-mcp configured in Cline
 - [ ] Robot Framework installed locally (for testing)
@@ -225,37 +213,39 @@ Take a Playwright test, convert it to Robot Framework using Cline + rf-mcp, run 
 
 ### Demo Flow (12 min breakdown)
 
-**1. Start with Playwright test (1 min)**
-- Show the Playwright test generated in Demo 1
-- Say: "We recorded this Playwright test. Now let's see what happens when we convert it to Robot Framework using Cline's rf-mcp access."
+**1. Start Playwright codegen (2 min)**
+- Say: "We're starting fresh. Let's record a test using Playwright's codegen — `npx playwright codegen`."
+- Run `npx playwright codegen http://localhost:5173` to open the browser with codegen active
+- Show the Playwright Inspector panel recording interactions
+- Say: "Playwright is now watching everything we do. As we interact with the app, it records the steps."
 
-**2. Cline converts Playwright to Robot (3 min)**
+**2. Record test interactions (3 min)**
+- Perform a simple user flow in the app (e.g., navigate, fill a form, submit, verify result)
+- Say: "See how Playwright captures each click, text input, and assertion. It's automatically building a test as we go."
+- Stop codegen and show the generated Playwright test code
+- Say: "Cline now has the raw Playwright test. It's readable, but what if we want to run this in Robot Framework instead?"
+
+**3. Cline converts Playwright to Robot (2 min)**
 - Ask Cline: "Convert this Playwright test to a Robot Framework test. Use the Browser library. Keep the same test flow."
 - Cline generates Robot Framework test code with proper syntax:
   - `*** Settings ***` with Browser library import
   - `*** Test Cases ***` with the test
   - Keywords properly structured
-- Say: "Cline understands both frameworks and generates valid Robot syntax automatically."
+- Say: "Cline understands both frameworks and converts the test automatically."
 
-**3. Run Robot test via rf-mcp (3 min)**
+**4. Run Robot test via rf-mcp (2 min)**
 - Ask Cline to run the Robot test using rf-mcp
 - Cline executes the test directly with MCP access
 - Show the test running and passing
 - Say: "The test runs and passes. Cline has direct access to Robot Framework via rf-mcp — it runs the test and gets the full output."
 
-**4. Analyze for best practices (4 min)**
-- Ask Cline: "Analyze this Robot test. Is it following Robot Framework best practices? Check keyword naming, test structure, library usage, documentation, and variable naming."
-- Cline reviews the test and provides feedback:
-  - Suggests better keyword extraction (breaking down steps into reusable keywords)
-  - Recommends documentation format (*** Keywords ***, better test descriptions)
-  - Suggests variable naming conventions (${BROWSER} vs ${browser})
-  - Recommends wait strategies and implicit waits
-  - Points out logging and reporting improvements
-- Show Cline's analysis appearing inline
-- Say: "Cline analyzes the test structure and suggests how to make it more maintainable and aligned with Robot Framework conventions."
+**5. Analyze for best practices (2 min)**
+- Ask Cline: "Review this Robot test for best practices. Suggest improvements in keyword extraction, documentation, and variable naming."
+- Cline provides feedback on structure and maintainability
+- Say: "Cline analyzes the test and suggests improvements. That's the workflow: record with Playwright, convert to Robot, run via rf-mcp, and improve with Cline's guidance."
 
-**5. Wrap up (1 min)**
-- Say: "That's the workflow: record in Playwright, convert to Robot, run via rf-mcp, and improve using Cline's understanding of best practices. MCP makes all of this seamless."
+**6. Wrap up (1 min)**
+- Say: "From live interaction to Playwright recording to Robot conversion to execution via rf-mcp — all in one flow. MCPs enable this seamless translation between frameworks."
 
 ### Script/Talking Points
 > "We have a Playwright test from the previous demo. Let's see how Cline converts it to Robot Framework."
@@ -290,7 +280,7 @@ Show that MCPs aren't required for everything — some workflows don't need them
 > 
 > **Where MCPs don't add much:**
 > - **One-off tasks** — If you're checking GitLab MR status once a day, MCP doesn't save friction. CLI is fine.
-> - **Simple queries** — If you're running a quick database query, you don't need Claude's reasoning. arangosh works.
+> - **Simple queries** — If you're running a quick database query, the CLI works fine. arangosh is simpler.
 > - **CI/CD** — In your pipeline, tests run headlessly. No IDE, no interactive feedback. CLI is the right tool.
 > 
 > **Where MCPs make a real difference:**
@@ -315,7 +305,7 @@ Show that MCPs aren't required for everything — some workflows don't need them
 - Feedback-driven development
 
 ### Key Talking Points
-- "We're asking security to approve three MCPs that solve real friction. We're not trying to MCP everything."
+- "We're asking security to approve six MCPs that solve real friction. We're not trying to MCP everything."
 - "This is honest: some workflows don't need the approval overhead. That's fine."
 - "We're being selective about what's worth it."
 
@@ -336,23 +326,28 @@ Remove uncertainty. Show exactly how approval works and what security reviews.
 > 
 > It's the same reason you can't just install random npm packages — they touch your system. Security reviews are actually good here."
 
-**Part 2: The Approval Process (4 min)**
-> "Here's what happens:
+**Part 2: Our Approach (4 min)**
+> "We're being proactive with security. Instead of asking them to evaluate from scratch, we're:
 > 
-> 1. **We request approval** — Submit three MCPs: playwright, rf-mcp, context7. Include: what they do, what permissions they need, why we need them.
-> 2. **Security reviews** — They evaluate: Does it have the right error handling? Does it log securely? Can it leak credentials? (They'll ask us questions.)
-> 3. **We answer** — Clarify any concerns, point them to documentation, show how we're using it safely.
-> 4. **Approval or mitigation** — Either 'approved' or 'approved with restrictions' (e.g., 'only use on non-prod databases').
-> 5. **Rollout** — Teams start using the approved MCPs. One approval works everywhere: VS Code, IntelliJ, CLI, any environment.
+> 1. **Create a security evaluation plan** — Document what we're assessing for each MCP: error handling, credential handling, data flow, logging, potential risks.
+> 2. **Write security reports** — For each of the six MCPs, we've already analyzed: what it does, what permissions it needs, what could go wrong, and how we mitigate it.
+> 3. **Submit to security** — Hand them the evaluation plan and all six reports upfront. No surprises, no back-and-forth on 'what do these do.'
+> 4. **Security reviews** — They verify our analysis, ask targeted questions if needed (usually minor clarifications).
+> 5. **Approval** — Either 'approved' or 'approved with restrictions.' We move fast because we've done the homework.
+> 6. **Rollout** — Teams start using the approved MCPs. One approval works everywhere: VS Code, IntelliJ, CLI, any environment.
 > 
-> Timeline: Typically 1-2 weeks, sometimes faster if the tools are known and well-documented."
+> Timeline: Usually 1 week, sometimes faster because security doesn't need to reverse-engineer the MCPs."
 
 **Part 3: Your Role (3 min)**
-> "After this presentation, you don't need to do anything immediately. We'll take the approval request to security. Once approved, we'll share setup documentation tailored to your IDE or environment.
+> "Here's what we need from you:
+> 
+> 1. **Feedback on the evaluation plan** — Does it cover the risks you care about? Are we missing something?
+> 2. **Questions or concerns about specific MCPs** — Ask now, and we'll address them in the security reports.
+> 3. **After approval** — Setup instructions will be shared tailored to your IDE or environment.
 > 
 > **Key point:** One security approval covers all environments. You don't need separate approvals for VS Code vs IntelliJ vs CLI — it's all the same MCPs.
 > 
-> Questions about specific tools or concerns? Bring them now, and we'll include them in the security request."
+> Timeline: We're submitting the full evaluation plan and reports next week. You'll hear when security approves."
 
 ### Slides (3 slides)
 
@@ -362,17 +357,17 @@ Remove uncertainty. Show exactly how approval works and what security reviews.
 - They need IAM/credentials
 - This is similar to reviewing npm packages
 
-**Slide 2: The Approval Flow**
+**Slide 2: Our Approval Approach**
 ```
-Request → Security Reviews → We Clarify → Approved/Mitigated → Rollout
-(1-2 weeks typical)
+Evaluation Plan + Security Reports → Security Reviews → Approved/Mitigated → Rollout
+(~1 week, we do the homework upfront)
 ```
 
-**Slide 3: Next Steps**
-- Security request submitted with playwright, rf-mcp, context7
-- You'll hear when it's approved
-- Setup instructions shared to all developers
-- Questions? Raise them now or email [your email]
+**Slide 3: What We Need From You**
+- Review the evaluation plan — does it cover your concerns?
+- Questions about specific MCPs — ask now
+- After approval: setup instructions tailored to your IDE
+- Timeline: submitting reports next week
 
 ---
 
@@ -423,7 +418,7 @@ A: "These are local MCPs — they run on your machine, not cloud. Once set up, t
 4. Claude suggesting fix
 
 **Fallback narration:**
-> "If this were running live, you'd see Claude generate the test, run it, see that selector failing, and suggest the fix — all in one flow. Since the live version is being flaky, here's what it looks like when it works smoothly."
+> "If this were running live, you'd see Cline generate the test, run it, see that selector failing, and suggest the fix — all in one flow. Since the live version is being flaky, here's what it looks like when it works smoothly."
 
 ### If rf-mcp Demo Fails
 **Backup option:** Pre-recorded screenshot or text showing:
@@ -432,14 +427,14 @@ A: "These are local MCPs — they run on your machine, not cloud. Once set up, t
 3. Claude's suggested fix
 
 **Fallback narration:**
-> "This is a real example of a Robot test failure. Notice how the log is hard to parse — lots of noise. Claude analyzes that and pinpoints: the element lookup failed because the page wasn't ready. Instead of you digging through logs, Claude does that work for you."
+> "This is a real example of a Robot test failure. Notice how the log is hard to parse — lots of noise. Cline analyzes that and pinpoints: the element lookup failed because the page wasn't ready. Instead of you digging through logs, Cline does that work for you."
 
 ---
 
 ## Preparation Checklist
 
 - [ ] **Slides created** in your preferred tool (PowerPoint, Google Slides, etc.)
-- [ ] **Playwright MCP configured** in Claude Code (test live)
+- [ ] **Playwright MCP configured** in Cline (test live)
 - [ ] **rf-mcp configured** (test with a sample Robot test)
 - [ ] **Demo scripts written out** (talking points for each demo)
 - [ ] **Backup screenshots/videos captured** (if live demos fail)
