@@ -1,288 +1,152 @@
-# MCP Security Evaluation Guide
+# MCP Security Evaluation Checklist
 
-Evaluating a local MCP (Model Context Protocol server) is about understanding what it can access and whether you trust it. This guide walks through how to do that systematically.
+## Phase 0: Immediate Rejection Criteria (Stop if any true)
 
-Local MCPs run directly on your machine with access to your files, environment variables, and processes. That's why evaluation matters—a compromised MCP can compromise your system.
+1. Unpatched critical CVEs (CVSS ≥9.0) with no fix
+2. Hardcoded credentials or API keys in source code
+3. Post-install scripts making network requests
+4. Native bindings (.node files) from untrusted sources
+5. Clear malicious intent (obfuscation, credential theft, exfiltration)
+6. No source code available (closed source)
+7. Project abandoned 2+ years with open security issues
 
----
-
-## What You're Looking For
-
-Three things:
-1. **Is the code from a trusted source?** (public, maintained, no obvious red flags)
-2. **What can it actually do?** (file access, network access, dangerous tools)
-3. **Can you restrict what it does?** (configuration options, firewall rules, OS permissions)
-
----
-
-## When to Reject Immediately
-
-Don't waste time on a full evaluation if any of these are true:
-
-- Unpatched critical CVEs (CVSS ≥9.0) with no fix in sight
-- Hardcoded credentials or API keys in the source code
-- Post-install scripts that make network requests (runs arbitrary code at install time)
-- Native bindings (.node files) from unknown or untrusted sources
-- Clear evidence of malicious intent—obfuscation, credential stealing, exfiltration
-- No source code available (closed source or removed from public repos)
-- Project abandoned for 2+ years with open security issues
-- Tool descriptions that are explicitly malicious or suspicious
-
-If you find any of these: stop, document it, and reject. No further review needed.
+**Action:** If any are true, reject and stop.
 
 ---
 
-## Available Tools
+## Phase 1: Quick Scan (30 minutes)
 
-Before you start manual analysis, use these automated tools. They're fast and catch obvious issues.
+1. Run: `npm audit --audit-level=moderate`
+2. Run: `npm outdated`
+3. Verify: Is repo public on GitHub? Actively maintained (commits last 6 months)?
+4. Read: README for permissions and security explanation
+5. Analyze source code, focusing on:
+   - Network requests (fetch, axios, request)
+   - File system access (fs, path)
+   - Child process execution (child_process)
+   - Native bindings (.node files)
+6. **AI Prompt:** "Review these npm audit results for critical issues: [paste output]"
 
-**Web-based (no setup required):**
-- **MCPScan.ai** — Paste a GitHub URL, get a security scan in 30 seconds. Catches command injection, poisoning, data exfiltration issues.
-- **Socket.dev** — Analyzes npm packages for risky behavior (post-install scripts, native bindings, sketchy patterns).
-
-**CLI tools (if you want deeper analysis):**
-- **Snyk agent-scan** — Detects prompt injection, tool poisoning, tool shadowing. Scans MCPs and AI agents.
-- **Semgrep** — Static code analysis. Good at finding security patterns and bugs.
-
-**MCP registries:**
-- **MCPVerified** — Directory of MCPs with security reviews.
-- **Official MCP Registry** — List of published MCPs at modelcontextprotocol.io.
-
----
-
-## The Evaluation Phases
-
-You can do this in phases. Stop early if something looks wrong.
-
-### Quick Scan (30 minutes)
-
-Start here. You're just checking if this is a legitimate project worth looking at deeper.
-
-- [ ] Run MCPScan.ai on the GitHub repo (takes 1 minute)
-- [ ] Check npm audit (or equivalent for your language): `npm audit --audit-level=moderate`
-- [ ] Is the repo public on GitHub? Is it actively maintained (commits in the last 6 months)?
-- [ ] Does the README explain what it does and what permissions it needs?
-- [ ] Any hardcoded credentials lying around in package.json or config?
-
-If everything checks out here, keep going. If you find something concerning, investigate deeper before deciding.
+**Decision:** If nothing concerning, proceed to Phase 2. If suspicious, investigate deeper.
 
 ---
 
-### Medium Dive (2 hours)
-
-Now you're looking at the actual code and how it works.
+## Phase 2: Medium Dive (2 hours)
 
 **Dependencies:**
 
-- [ ] Check the dependency tree: what does this thing actually pull in?
-  - `npm ls --all` for JavaScript/Node
-  - `pip list` for Python
-  - Look for post-install scripts (red flag)
-  - Flag native bindings—are they from trusted sources?
-
-- [ ] Search the source for risky patterns: `eval`, `exec`, `spawn`, things that run code dynamically
-- [ ] Any obvious hardcoded secrets? Search for "password", "secret", "api_key", "token"
-- [ ] Check if there are deprecated packages or packages that haven't been updated in years
+1. Run: `npm ls --all` (view full dependency tree)
+2. Run: `npm outdated` (check for deprecated packages)
+3. Run: `Get-ChildItem node_modules -Recurse -Filter *.node` (find native bindings)
+4. Search for code execution patterns:
+   ```powershell
+   Get-ChildItem -Path src -Recurse -Include *.js,*.ts | Select-String -Pattern "eval|exec|spawn|child_process"
+   ```
 
 **Runtime behavior:**
 
-- [ ] Create some test files and try to access them. Can the MCP read/write only in its declared scope, or can it access your whole disk?
-- [ ] Try running it as a restricted user (not admin). Does it work normally, or does it need elevated privileges?
-- [ ] Can it see sensitive files like .ssh directories? Try to verify it can't.
+5. Create test files in your home directory
+6. Run the MCP and verify it can only access declared directories
+7. Try accessing sensitive files (.ssh, .aws): should fail
+8. **AI Prompt:** "Analyze this dependency tree for suspicious or risky packages: [paste npm ls output]"
+9. **AI Prompt:** "Review this code for security vulnerabilities: [paste code sections]"
 
-Use Socket.dev if you want quick analysis of the npm package. Use Semgrep if you want to grep the code automatically for security patterns.
+**Decision:** If all looks good, proceed to Phase 3 only if needed. Otherwise, document findings.
 
 ---
 
-### Deep Dive (4+ hours)
+## Phase 3: Deep Dive (4+ hours, only if Phase 2 raised concerns)
 
-For critical MCPs or when the medium dive raised questions. This is where you verify runtime behavior.
+**Process monitoring:**
+
+1. Download **Process Monitor** (Sysinternals from microsoft.com)
+2. Run as admin, filter by MCP process name
+3. Watch for:
+   - Unexpected file reads/writes
+   - Registry access
+   - Process spawning
+4. Check network connections:
+   ```powershell
+   netstat -ano | findstr node.exe
+   ```
+5. **AI Prompt:** "I captured this Process Monitor output from the MCP. What security concerns do you see? [paste output]"
 
 **Code review:**
 
-- [ ] Read through the source carefully. Look at error handling—do error messages leak paths or secrets?
-- [ ] Check the permission model: does it follow least privilege or is it overpermissive?
-- [ ] Audit the transitive dependencies. Not just direct deps, but what do *they* pull in?
-
-**Runtime testing:**
-
-- [ ] Use Process Monitor (Windows) to watch what the MCP actually does
-  - What files does it open?
-  - What processes does it spawn?
-  - What environment variables does it read?
-  - Does it write outside its declared directories?
-
-- [ ] If it makes network calls, inspect them with Wireshark or mitmproxy
-  - Where is it calling?
-  - Is TLS working properly?
-  - Are credentials in the clear anywhere?
-
-- [ ] Run static analysis (Semgrep, Snyk) if the code is complex
+6. Read source code carefully for:
+   - Error handling (do errors leak paths or secrets?)
+   - Permission model (least privilege or overpermissive?)
+   - Transitive dependencies (audit what dependencies pull in)
 
 ---
 
-## MCP Configuration: What Can You Actually Restrict?
+## Phase 4: Make the Decision
 
-Every MCP is different, but here's what you should look for:
+Use this table:
 
-**File system:** Can you limit it to a specific directory? Is there a flag like `--workspace-root` or `--file-access restricted`?
-
-**Network:** Can you restrict which domains it can reach? Look for `--allowed-origins`, `--network-whitelist`, or similar.
-
-**Tools/capabilities:** Can you disable specific functions? Some MCPs let you say "use this tool but not that one." Others expose everything.
-
-**Process:** Can you set resource limits (memory, CPU, timeout)?
-
-Check the README first. If that doesn't say, run `--help`. If that doesn't work, ask the maintainer on GitHub.
+| Finding | Decision |
+|---------|----------|
+| Red flags found | **Reject** |
+| RCE-like tools but access-controllable | **Approve (with monitoring)** |
+| Risks are configurable/restrictable | **Approve with restrictions** |
+| Multiple high-risk findings, no mitigations | **Escalate to security team** |
+| Clean scan, low risk | **Approve** |
 
 ---
 
-## Questions to Ask Before Approval
+## Phase 5: Document Findings
 
-Get answers to these. They'll guide your decision.
+Create a security review document with:
 
-1. **File access:** Does this thing need to read/write files? If so, which directories? Read-only or read-write?
-
-2. **Network:** Does it phone home to external servers? If so, which ones? (You'll need this for firewall rules.)
-
-3. **Privileges:** Can it run as a normal user, or does it need admin rights?
-
-4. **Secrets:** Does it read environment variables or config files? Could those contain credentials?
-
-5. **Dependencies:** Are the direct and transitive dependencies all from trusted sources? Any post-install scripts doing weird stuff?
-
----
-
-## Making the Decision
-
-After you've done the review, here's how to decide:
-
-**Did you find red flags (unpatched CVEs, hardcoded secrets, malicious code)?**  
-→ Reject. Done.
-
-**Did the automated tools flag critical issues?**  
-→ Investigate further. If it's a false positive, document why. If it's real, reject.
-
-**Can the risky capabilities be restricted?**  
-→ Good. Document what you need to restrict (firewall rules, config flags, OS permissions).
-
-**Are the optional dependencies a problem?**  
-→ If the MCP offers modular features, only install what you need. SeleniumLibrary for web testing? Only if you're doing web testing.
-
-**Is there a clear way to monitor what it does?**  
-→ Can you watch file access, network traffic, process creation? If yes, approval is safer.
-
-**Final decision table:**
-
-- All red flags passed + risks are configurable/restrictable → **Approve**
-- Red flags passed + some risks but good mitigations available → **Approve with restrictions**
-- RCE-like tools present but can be access-controlled → **Approve (with monitoring)**
-- Multiple high-risk findings with no way to mitigate → **Escalate to security team**
-- Red flags found or no possible mitigations → **Reject**
+1. **What was checked:** Which phases completed, which tools used
+2. **What was found:** Summary of findings (or "no issues")
+3. **Restrictions needed (if any):**
+   - Firewall rules (if network access needed)
+   - Config flags to enable/disable features
+   - OS permissions to restrict
+   - User account requirements
+   - Monitoring requirements
 
 ---
 
-## Running the Evaluation
+## Common Commands Reference
 
-Here's the workflow:
-
-1. **Check red flags** (5 min) — If any are true, stop and reject
-2. **Quick scan** (30 min) — Automated tools + basic checks
-3. **Medium dive** (2 hours) — Code review + dependency audit + runtime checks
-4. **Deep dive** (4+ hours) — Process Monitor + Wireshark + detailed analysis (only if needed)
-5. **Decision** — Use the decision table above
-
----
-
-## Windows Tools Reference
-
-You'll need some tools for the deep dive on Windows. Here's what to use:
-
-**File & process monitoring:**
-- **Process Monitor** (Sysinternals) — Watch what the MCP accesses
-  - Download from Microsoft's site
-  - Run as admin, filter by process name
-  - Look for unexpected file reads/writes, registry access, process spawning
-
-**Network monitoring:**
-- **netstat** — Built-in Windows command, see active connections
-  - `netstat -ano | findstr node.exe` to see what a node process is connecting to
-- **Wireshark** — Detailed packet inspection if you need to see HTTPS traffic
-  - Download from wireshark.org
-
-**Testing permissions:**
-- **Local Users and Groups** (lusrmgr.msc) — Create a restricted test user
-- **runas** command — Run the MCP as that user
-- **NTFS permissions** — Set file access restrictions via Properties
-
----
-
-## Common Commands
-
-Checking dependencies:
-
+**Dependency checks:**
 ```powershell
-# npm/Node
 npm audit --audit-level=moderate
 npm outdated
 npm ls --all
-Get-ChildItem node_modules -Recurse -Filter *.node  # Find native bindings
-
-# Python
-pip list
-pip check  # Look for dependency conflicts
+Get-ChildItem node_modules -Recurse -Filter *.node
 ```
 
-Searching for risky patterns:
-
+**Search for risky patterns:**
 ```powershell
-# Search for eval, exec, spawn
-Get-ChildItem -Path src -Recurse -Include *.js,*.ts | Select-String -Pattern "eval|exec|spawn"
+# Code execution patterns
+Get-ChildItem -Path src -Recurse -Include *.js,*.ts | Select-String -Pattern "eval|exec|spawn|child_process"
 
-# Search for hardcoded secrets
+# Hardcoded secrets
 Get-ChildItem -Path src -Recurse -Include *.js,*.ts,*.json | Select-String -Pattern "password|secret|api_key|token"
 ```
 
-Testing file access:
-
+**Network/process inspection:**
 ```powershell
-# Try to access a restricted file as the MCP user
+netstat -ano | findstr node.exe
+```
+
+**Test file access (as restricted user):**
+```powershell
 runas /user:mcp_user "type C:\Windows\System32\config\sam"
 # Should fail: "Access Denied"
 ```
 
-Monitoring:
-
-```powershell
-# See what the process is connecting to
-netstat -ano | findstr node.exe
-
-# Check what files it's accessing (use Process Monitor GUI, not command line)
-```
-
 ---
 
-## What Happens Next
+## Default Workflow
 
-Once you've done the evaluation:
+1. **Always start with Phase 0** — 5 minutes, stops bad projects immediately
+2. **Always do Phase 1** — 30 minutes, automated checks
+3. **Do Phase 2 if Phase 1 is clean** — 2 hours, code review + testing
+4. **Do Phase 3 only if Phase 2 raised questions** — deep investigation
+5. **Document and decide** — using decision table
 
-1. **Document your findings** — What did you check? What did you find? Any restrictions needed?
-2. **Make the call** — Approve, approve with restrictions, or reject
-3. **If approved with restrictions** — Document them clearly:
-   - Firewall rules needed
-   - Config flags to enable/disable
-   - OS permissions to set
-   - User account requirements
-   - Monitoring strategy
-4. **Set up monitoring** — Even if you approve, watch what it actually does in production
-
----
-
-## Resources
-
-- **OWASP Security Coding Practices** — owasp.org
-- **npm Security Docs** — docs.npmjs.com/cli/v9/using-npm/security
-- **Node.js Security** — nodejs.org/en/docs/guides/security/
-- **MCP Specification** — modelcontextprotocol.io/docs
-- **Sysinternals Process Monitor** — microsoft.com/en-us/sysinternals/downloads/procmon
-- **Wireshark** — wireshark.org
+Most MCPs should pass or fail by end of Phase 2.
