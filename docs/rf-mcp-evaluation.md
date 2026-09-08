@@ -1,37 +1,27 @@
-# rf-mcp Security Evaluation
+# rf-mcp Security Evaluation Report
 
-**MCP:** rf-mcp (Robot Framework MCP Server)  
+**Package:** rf-mcp (Robot Framework MCP Server)  
 **Version:** 0.35.0  
 **Repository:** https://github.com/manykarim/rf-mcp  
 **Language:** Python ≥3.10  
-**Package Manager:** PyPI  
+**License:** Apache-2.0  
 **Evaluation Date:** 2026-08-28  
-**Evaluated Using:** MCP Security Evaluation Guide (Windows, Python variant)
+**Evaluated By:** Claude Code  
 
 ---
 
 ## Executive Summary
 
-**Status:** PROCEED TO APPROVAL DECISION
+**Overall Risk Level:** MEDIUM (variable by feature selection)  
+**Recommendation:** APPROVE WITH RESTRICTIONS
 
-rf-mcp is an actively maintained, open-source Robot Framework MCP server for test automation. It enables AI agents to discover, execute, and generate Robot Framework test cases across multiple platforms (browser, mobile, API, database, desktop).
+rf-mcp is an actively maintained Robot Framework MCP server for test automation. **Active maintenance, no known CVEs.** Modular architecture with optional dependencies; security risk depends on which features are installed. Core-only installation has LOW risk; full installation has MEDIUM-HIGH risk.
 
-**Evaluation shows:** Moderate security posture with **active maintenance and no known CVEs**. However, modular architecture with many optional dependencies increases supply-chain attack surface. File and network access patterns depend on enabled optional features.
-
-**Red Flags Check:** ✅ PASS — No blockers found
-
-**Key Points:**
-- ✅ Public GitHub, Apache-2.0 licensed, actively maintained (daily commits)
-- ✅ No known CVEs or security advisories
-- ✅ No hardcoded credentials, closed source, or abandoned status
-- ⚠️ Modular optional dependencies (web, mobile, api, desktop) increase complexity
-- ⚠️ Can execute arbitrary Robot Framework keywords (by design)
-- ⚠️ Network/file access depends on installed optional libraries (SeleniumLibrary, Appium, etc.)
-- ⚠️ No SECURITY.md or responsible disclosure policy documented
+**Key Concern:** Optional dependencies (SeleniumLibrary, Appium, PlatynUI) introduce network/file access risk.
 
 ---
 
-## Red Flags Check
+## Phase 0: Immediate Rejection Criteria
 
 **Stop evaluation if ANY found. Results:**
 
@@ -46,11 +36,11 @@ rf-mcp is an actively maintained, open-source Robot Framework MCP server for tes
 | Abandoned project | ✅ PASS | Actively maintained, commits as recent as Aug 7, 2026 |
 | Malicious or suspicious tool descriptions | ✅ PASS | Tools are documented for test automation purpose |
 
-**Red Flags Result:** ✅ PASS (with note on PlatynUI native bindings for desktop automation)
+**Phase 0 Result:** ✅ **PASS** (with note on PlatynUI native bindings)
 
 ---
 
-## Quick Review (30 min) — COMPLETED
+## Phase 1: Quick Scan (30 minutes)
 
 ### Automated Security Scanners
 
@@ -69,11 +59,11 @@ rf-mcp is an actively maintained, open-source Robot Framework MCP server for tes
 - [x] Hardcoded secrets in source? → **No**
 - [x] Dependency metadata transparent? → **Yes**, PyPI lists all dependencies clearly
 
-**Quick Review Result:** ✅ PASS — Proceed to Medium Review
+**Phase 1 Result:** ✅ **PASS** — Proceed to Phase 2
 
 ---
 
-## Medium Review (2 hours) — COMPLETED
+## Phase 2: Medium Dive (2 hours)
 
 ### Code & Dependencies Analysis
 
@@ -149,11 +139,11 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ⚠️ Desktop automation (PlatynUI) may require elevated privileges on Windows
 - ✅ Browser automation runs as current user
 
-**Medium Review Result:** ✅ PASS with documented risks based on optional features
+**Phase 2 Result:** ✅ **PASS** with documented risks based on optional features
 
 ---
 
-## Deep Review (4+ hours) — PARTIAL (Runtime Testing Needed)
+## Phase 3: Deep Dive (Partial — Runtime Testing Needed)
 
 ### Detailed Code Analysis
 
@@ -220,13 +210,13 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ❓ What environment variables are read?
 - ❓ Does PlatynUI require admin privileges?
 
-**Deep Review Status:** ⚠️ INCOMPLETE — Runtime testing with Process Monitor needed
+**Phase 3 Status:** ⚠️ INCOMPLETE — Runtime testing with Process Monitor needed
 
 ---
 
-## Attack Scenarios
+## Phase 4: Make the Decision
 
-### Scenario 1: Malicious Test File Injection
+### Attack Scenario 1: Malicious Test File Injection
 **Attack:** Inject Robot Framework code via test file that executes system commands  
 **Impact:** Code execution within rf-mcp process privilege level  
 **Mitigation:**
@@ -234,7 +224,7 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ✅ Use file permissions (NTFS ACLs) to restrict test file modification
 - ✅ Review test files before execution
 
-### Scenario 2: Library Exploitation
+### Attack Scenario 2: Library Exploitation
 **Attack:** Compromised SeleniumLibrary or Appium sends credentials to attacker server  
 **Impact:** Session hijacking, credential theft  
 **Mitigation:**
@@ -243,7 +233,7 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ✅ Use firewall to restrict outbound network
 - ✅ Run behind HTTPS proxy (mitmproxy) to inspect traffic
 
-### Scenario 3: Desktop Automation Privilege Escalation
+### Attack Scenario 3: Desktop Automation Privilege Escalation
 **Attack:** Use PlatynUI to access Windows registry or system files  
 **Impact:** System compromise  
 **Mitigation:**
@@ -251,7 +241,7 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ✅ Run as restricted user (not admin)
 - ✅ Monitor process for registry access with Process Monitor
 
-### Scenario 4: Resource Exhaustion
+### Attack Scenario 4: Resource Exhaustion
 **Attack:** Create infinite loop test that spawns many browser instances  
 **Impact:** Out of memory, system hangs  
 **Mitigation:**
@@ -376,55 +366,15 @@ Before approval, answer:
 
 ---
 
-## Approval Decision
-
-**Following Approval Decision Flow from MCP Security Evaluation Guide:**
-
-### Step 1: Red Flags Check ✅
-All red flags passed (see above). Note: PlatynUI native bindings are documented and intentional.
-
-### Step 2: Tool Results ✅
-- **MCPScan.ai:** Unable to verify (API service unavailable as of 2026-08-29)
-- **GitHub Security Advisories:** No active CVEs
-- **PyPI Health:** Project actively maintained
-- **Direct Dependencies:** All well-maintained, no critical issues
-→ Core checks passed. Proceed. (Recommend retry MCPScan.ai when service available)
-
-### Step 3: Evaluate Configuration ✅
-
-| Capability | Restricted? | Configuration |
-|-----------|------------|----------------|
-| Optional Features | ✅ YES | Install only required features |
-| Workspace Access | ✅ YES | `RF_MCP_WORKSPACE` environment variable |
-| Keyword Execution | ❌ NO | All Robot Framework keywords available |
-| Network (if web enabled) | ⚠️ PARTIAL | Firewall + Optional library controls |
-
-**Finding:** Risk level depends on which optional features are installed. Core-only installation has low risk. Full installation with all features has medium-high risk.
-
-### Step 4: Can Mitigations Address Risks?
-
-**Risk:** Optional libraries (SeleniumLibrary, Appium, PlatynUI) introduce network/file access  
-**Mitigation:** Only install required features; restrict via firewall and NTFS permissions  
-**Addressed?** ✅ YES — Risk scales with feature selection
-
-**Risk:** Test file execution may include malicious Robot Framework code  
-**Mitigation:** Workspace restrictions + file permissions + code review  
-**Addressed?** ✅ YES — Can enforce via configuration
-
-**Risk:** Desktop automation (PlatynUI) may access Windows registry  
-**Mitigation:** Only install if needed; run as restricted user; monitor with Process Monitor  
-**Addressed?** ✅ YES — Can be disabled entirely if not needed
-
-### Decision
+## Decision Summary
 
 | Criteria | Result | Notes |
 |----------|--------|-------|
-| Red flags found | ❌ None | All checks passed |
+| Phase 0: Red flags | ❌ None | All checks passed |
+| Phase 1: Basic checks | ✅ Pass | Actively maintained, no CVEs |
+| Phase 2: Config review | ✅ Pass | Features configurable/optional |
 | Unpatched CVEs | ❌ None | No known vulnerabilities |
-| Active maintenance | ✅ Yes | Recent commits, responsive to issues |
-| Configurable | ✅ Yes (mostly) | Features optional; workspace configurable |
-| Network access | ⚠️ Depends | Only if web/api/mobile features enabled |
-| Mitigations adequate | ✅ Yes | Risk can be managed via feature selection |
+| Mitigations adequate | ✅ Yes | Risk depends on feature selection |
 
 **APPROVAL RECOMMENDATION: ✅ APPROVE WITH RESTRICTIONS**
 
@@ -493,7 +443,9 @@ If using desktop automation:
 
 ---
 
-## Pre-Deployment Checklist
+## Phase 5: Documentation & Restrictions
+
+### Pre-Deployment Checklist
 
 - [ ] Determine required optional features (web, mobile, api, desktop, etc.)
 - [ ] Install only required features: `pip install rf-mcp[<features>]`
@@ -517,7 +469,7 @@ If using desktop automation:
 
 ---
 
-## Evaluation Summary
+## Summary
 
 | Aspect | Status | Notes |
 |--------|--------|-------|
@@ -546,6 +498,15 @@ If using desktop automation:
 
 ---
 
+## Approval Status
+
+**Status:** ✅ **APPROVE WITH RESTRICTIONS**  
+**Risk Level:** MEDIUM (variable by feature selection)  
+**Conditions:** 8 required (see Phase 5)  
+**Valid Until:** Conditions implemented within 30 days
+
+---
+
 ## References
 
 - [GitHub: manykarim/rf-mcp](https://github.com/manykarim/rf-mcp)
@@ -555,3 +516,8 @@ If using desktop automation:
 - [AppiumLibrary Documentation](https://github.com/serhatbolsu/robotframework-appiumlibrary)
 - [MCP Specification](https://modelcontextprotocol.io/docs)
 - [MCP Security Evaluation Guide](./mcp-security-evaluation-plan.md)
+
+---
+
+**Report Version:** 2.0 (Reformatted to 5-phase structure)  
+**Last Updated:** 2026-09-08

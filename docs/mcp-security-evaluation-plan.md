@@ -1,6 +1,6 @@
 # MCP Security Evaluation Checklist
 
-## Phase 0: Immediate Rejection Criteria (Stop if any true)
+## Phase 1
 
 1. Unpatched critical CVEs (CVSS ≥9.0) with no fix
 2. Hardcoded credentials or API keys in source code
@@ -14,24 +14,28 @@
 
 ---
 
-## Phase 1: Quick Scan (30 minutes)
+## Phase 2
 
-1. Run: `npm audit --audit-level=moderate`
-2. Run: `npm outdated`
-3. Verify: Is repo public on GitHub? Actively maintained (commits last 6 months)?
-4. Read: README for permissions and security explanation
-5. Analyze source code, focusing on:
+1. Use **package-scan.vercel.app** for automated dependency analysis (no clone needed):
+   - Navigate to https://package-scan.vercel.app
+   - Enter package name (e.g., `@djankies/vitest-mcp`)
+   - Review: Vulnerabilities count, license, stability metrics
+2. Verify: Is repo public on GitHub? Actively maintained (commits last 6 months)?
+   - Check last commit date from PackSage or npm registry
+   - Confirm GitHub URL is accessible
+3. Read: README for permissions and security explanation
+4. Analyze source code (from PackSage display or GitHub), focusing on:
    - Network requests (fetch, axios, request)
    - File system access (fs, path)
    - Child process execution (child_process)
    - Native bindings (.node files)
-6. **AI Prompt:** "Review these npm audit results for critical issues: [paste output]"
+5. **AI Prompt:** "Review these dependency and security findings: [paste PackSage output]"
 
-**Decision:** If nothing concerning, proceed to Phase 2. If suspicious, investigate deeper.
+**Decision:** If nothing concerning, proceed to Phase 3. If suspicious, investigate deeper.
 
 ---
 
-## Phase 2: Medium Dive (2 hours)
+## Phase 3
 
 **Dependencies:**
 
@@ -51,11 +55,11 @@
 8. **AI Prompt:** "Analyze this dependency tree for suspicious or risky packages: [paste npm ls output]"
 9. **AI Prompt:** "Review this code for security vulnerabilities: [paste code sections]"
 
-**Decision:** If all looks good, proceed to Phase 3 only if needed. Otherwise, document findings.
+**Decision:** If all looks good, proceed to Phase 5 only if needed. Otherwise, document findings.
 
 ---
 
-## Phase 3: Deep Dive (4+ hours, only if Phase 2 raised concerns)
+## Phase 4 (only if Phase 3 raised concerns)
 
 **Process monitoring:**
 
@@ -77,20 +81,6 @@
    - Error handling (do errors leak paths or secrets?)
    - Permission model (least privilege or overpermissive?)
    - Transitive dependencies (audit what dependencies pull in)
-
----
-
-## Phase 4: Make the Decision
-
-Use this table:
-
-| Finding | Decision |
-|---------|----------|
-| Red flags found | **Reject** |
-| RCE-like tools but access-controllable | **Approve (with monitoring)** |
-| Risks are configurable/restrictable | **Approve with restrictions** |
-| Multiple high-risk findings, no mitigations | **Escalate to security team** |
-| Clean scan, low risk | **Approve** |
 
 ---
 
@@ -138,15 +128,3 @@ netstat -ano | findstr node.exe
 runas /user:mcp_user "type C:\Windows\System32\config\sam"
 # Should fail: "Access Denied"
 ```
-
----
-
-## Default Workflow
-
-1. **Always start with Phase 0** — 5 minutes, stops bad projects immediately
-2. **Always do Phase 1** — 30 minutes, automated checks
-3. **Do Phase 2 if Phase 1 is clean** — 2 hours, code review + testing
-4. **Do Phase 3 only if Phase 2 raised questions** — deep investigation
-5. **Document and decide** — using decision table
-
-Most MCPs should pass or fail by end of Phase 2.
