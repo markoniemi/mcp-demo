@@ -20,7 +20,7 @@ maven-mcp is a lightweight TypeScript MCP server for Maven Central artifact look
 
 ---
 
-## Phase 0: Immediate Rejection Criteria
+## Phase 1: Immediate Rejection Criteria
 
 | Criterion | Status | Finding |
 |-----------|--------|---------|
@@ -32,11 +32,11 @@ maven-mcp is a lightweight TypeScript MCP server for Maven Central artifact look
 | Source code unavailable | ✅ PASS | Public GitHub repository, full source |
 | Project abandonment (2+ years) | ✅ PASS | Active maintenance, recent releases (Oct 2025) |
 
-**Phase 0 Result:** ✅ **PASS** — No immediate rejection criteria found.
+**Phase 1 Result:** ✅ **PASS** — No immediate rejection criteria found.
 
 ---
 
-## Phase 1: Quick Scan (30 minutes)
+## Phase 2: Quick Scan (30 minutes)
 
 ### 1.1 Project Purpose & Permissions
 
@@ -86,11 +86,11 @@ maven-mcp@1.0.3
 | File I/O operations | None found | ✅ SAFE |
 | Child process spawning | None found | ✅ SAFE |
 
-**Phase 1 Result:** ✅ **PASS** — Proceed to Phase 2
+**Phase 2 Result:** ✅ **PASS** — Proceed to Phase 3
 
 ---
 
-## Phase 2: Medium Dive (2 hours)
+## Phase 3: Medium Dive (2 hours)
 
 ### 2.1 Network Access & Maven Central API
 
@@ -178,13 +178,13 @@ maven-mcp@1.0.3
 
 ---
 
-## Phase 3: Deep Dive (Not Needed)
+## Phase 4: Deep Dive (Not Needed)
 
-Phase 2 found no concerns. Clean, minimal attack surface. No Phase 3 investigation needed.
+Phase 3 found no concerns. Clean, minimal attack surface. No Phase 4 investigation needed.
 
 ---
 
-## Phase 4: Decision Table
+## Phase 5: Make the Decision
 
 | Criteria | Result | Notes |
 |----------|--------|-------|
@@ -202,7 +202,7 @@ Phase 2 found no concerns. Clean, minimal attack surface. No Phase 3 investigati
 
 ---
 
-## Phase 5: Final Assessment
+## Phase 6: Documentation & Final Assessment
 
 ### Security Posture Summary
 

@@ -21,7 +21,7 @@ rf-mcp is an actively maintained Robot Framework MCP server for test automation.
 
 ---
 
-## Phase 0: Immediate Rejection Criteria
+## Phase 1: Immediate Rejection Criteria
 
 **Stop evaluation if ANY found. Results:**
 
@@ -36,11 +36,11 @@ rf-mcp is an actively maintained Robot Framework MCP server for test automation.
 | Abandoned project | ✅ PASS | Actively maintained, commits as recent as Aug 7, 2026 |
 | Malicious or suspicious tool descriptions | ✅ PASS | Tools are documented for test automation purpose |
 
-**Phase 0 Result:** ✅ **PASS** (with note on PlatynUI native bindings)
+**Phase 1 Result:** ✅ **PASS** (with note on PlatynUI native bindings)
 
 ---
 
-## Phase 1: Quick Scan (30 minutes)
+## Phase 2: Quick Scan (30 minutes)
 
 ### Automated Security Scanners
 
@@ -59,11 +59,11 @@ rf-mcp is an actively maintained Robot Framework MCP server for test automation.
 - [x] Hardcoded secrets in source? → **No**
 - [x] Dependency metadata transparent? → **Yes**, PyPI lists all dependencies clearly
 
-**Phase 1 Result:** ✅ **PASS** — Proceed to Phase 2
+**Phase 2 Result:** ✅ **PASS** — Proceed to Phase 3
 
 ---
 
-## Phase 2: Medium Dive (2 hours)
+## Phase 3: Medium Dive (2 hours)
 
 ### Code & Dependencies Analysis
 
@@ -139,11 +139,11 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ⚠️ Desktop automation (PlatynUI) may require elevated privileges on Windows
 - ✅ Browser automation runs as current user
 
-**Phase 2 Result:** ✅ **PASS** with documented risks based on optional features
+**Phase 3 Result:** ✅ **PASS** with documented risks based on optional features
 
 ---
 
-## Phase 3: Deep Dive (Partial — Runtime Testing Needed)
+## Phase 4: Deep Dive (Partial — Runtime Testing Needed)
 
 ### Detailed Code Analysis
 
@@ -210,11 +210,11 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 - ❓ What environment variables are read?
 - ❓ Does PlatynUI require admin privileges?
 
-**Phase 3 Status:** ⚠️ INCOMPLETE — Runtime testing with Process Monitor needed
+**Phase 4 Status:** ⚠️ INCOMPLETE — Runtime testing with Process Monitor needed
 
 ---
 
-## Phase 4: Make the Decision
+## Phase 5: Make the Decision
 
 ### Attack Scenario 1: Malicious Test File Injection
 **Attack:** Inject Robot Framework code via test file that executes system commands  
@@ -370,9 +370,9 @@ Before approval, answer:
 
 | Criteria | Result | Notes |
 |----------|--------|-------|
-| Phase 0: Red flags | ❌ None | All checks passed |
-| Phase 1: Basic checks | ✅ Pass | Actively maintained, no CVEs |
-| Phase 2: Config review | ✅ Pass | Features configurable/optional |
+| Phase 1: Red flags | ❌ None | All checks passed |
+| Phase 2: Basic checks | ✅ Pass | Actively maintained, no CVEs |
+| Phase 3: Config review | ✅ Pass | Features configurable/optional |
 | Unpatched CVEs | ❌ None | No known vulnerabilities |
 | Mitigations adequate | ✅ Yes | Risk depends on feature selection |
 
@@ -443,7 +443,7 @@ If using desktop automation:
 
 ---
 
-## Phase 5: Documentation & Restrictions
+## Phase 6: Documentation & Restrictions
 
 ### Pre-Deployment Checklist
 

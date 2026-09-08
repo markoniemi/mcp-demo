@@ -35,7 +35,7 @@ This evaluation followed the 5-phase MCP Security Evaluation Checklist:
 
 ---
 
-## Phase 0: Immediate Rejection Criteria
+## Phase 1: Immediate Rejection Criteria
 
 | Criterion | Status | Finding |
 |-----------|--------|---------|
@@ -47,11 +47,11 @@ This evaluation followed the 5-phase MCP Security Evaluation Checklist:
 | Source code unavailable | ✅ PASS | Full source available on GitHub. |
 | Project abandonment (2+ years) | ✅ PASS | Actively maintained. Latest commit May 2026 (4 months old). |
 
-**Phase 0 Result:** ✅ **PASS** — No immediate rejection criteria found.
+**Phase 1 Result:** ✅ **PASS** — No immediate rejection criteria found.
 
 ---
 
-## Phase 1: Quick Scan (30 minutes)
+## Phase 2: Quick Scan (30 minutes)
 
 ### 1.1 Project Purpose & Permissions
 
@@ -100,11 +100,11 @@ This evaluation followed the 5-phase MCP Security Evaluation Checklist:
 
 **Dependency Risk:** LOW (mostly current; SLF4J alpha is non-ideal but not critical)
 
-**Phase 1 Result:** ✅ **PASS** — Recommendation to proceed to Phase 2
+**Phase 2 Result:** ✅ **PASS** — Recommendation to proceed to Phase 3
 
 ---
 
-## Phase 2: Medium Dive (2 hours)
+## Phase 3: Medium Dive (2 hours)
 
 ### 2.1 Input Validation
 

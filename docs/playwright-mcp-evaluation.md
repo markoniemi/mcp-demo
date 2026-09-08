@@ -20,7 +20,7 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 
 ---
 
-## Phase 0: Immediate Rejection Criteria
+## Phase 1: Immediate Rejection Criteria
 
 **Stop evaluation if ANY found. Results:**
 
@@ -35,11 +35,11 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 | Abandoned project | ✅ PASS | Active Microsoft project, regular commits |
 | Malicious or suspicious tool descriptions | ✅ PASS | Tools are documented, no suspicious descriptions |
 
-**Phase 0 Result:** ✅ **PASS** — No blockers. Proceed to Phase 1.
+**Phase 1 Result:** ✅ **PASS** — No blockers. Proceed to Phase 2.
 
 ---
 
-## Phase 1: Quick Scan (30 minutes)
+## Phase 2: Quick Scan (30 minutes)
 
 ### Automated Security Scanners
 
@@ -56,11 +56,11 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 - [x] Recent commits (last 6 months)? → **Yes**, actively maintained by Microsoft
 - [x] Hardcoded secrets in package.json/README? → **No**
 
-**Phase 1 Result:** ✅ **PASS** — Proceed to Phase 2
+**Phase 2 Result:** ✅ **PASS** — Proceed to Phase 3
 
 ---
 
-## Phase 2: Medium Dive (2 hours)
+## Phase 3: Medium Dive (2 hours)
 
 ### Code & Dependencies Analysis
 
@@ -129,11 +129,11 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 - ✅ Works normally with restricted user permissions
 - Browser process inherits user privileges only
 
-**Phase 2 Result:** ✅ **PASS** with documented risks
+**Phase 3 Result:** ✅ **PASS** with documented risks
 
 ---
 
-## Phase 3: Deep Dive (Partial — Runtime Testing Needed)
+## Phase 4: Deep Dive (Partial — Runtime Testing Needed)
 
 ### Detailed Code Analysis
 
@@ -177,11 +177,11 @@ Run: snyk-agent-scan --mcp @playwright/mcp@0.0.79
 - ❓ Verify destination domains (Microsoft services, CDN, etc.)
 - ❓ Verify TLS certificate validation working
 
-**Phase 3 Status:** ⚠️ INCOMPLETE — Runtime testing with Process Monitor and Wireshark needed
+**Phase 4 Status:** ⚠️ INCOMPLETE — Runtime testing with Process Monitor and Wireshark needed
 
 ---
 
-## Phase 4: Make the Decision
+## Phase 5: Make the Decision
 
 ### Attack Scenario 1: Malicious Page Execution
 **Attack:** MCP navigates to attacker page → Page executes JS → Accesses cookies/storage  
@@ -280,9 +280,9 @@ Run: snyk-agent-scan --mcp @playwright/mcp@0.0.79
 
 | Criteria | Result | Notes |
 |----------|--------|-------|
-| Phase 0: Red flags | ❌ None | All checks passed |
-| Phase 1: Basic checks | ✅ Pass | Active maintenance, clean deps |
-| Phase 2: Config review | ✅ Pass | File/network restrictions available |
+| Phase 1: Red flags | ❌ None | All checks passed |
+| Phase 2: Basic checks | ✅ Pass | Active maintenance, clean deps |
+| Phase 3: Config review | ✅ Pass | File/network restrictions available |
 | Unpatched CVEs | ❌ None | Version 0.0.79 is patched |
 | RCE tool present | ⚠️ Yes | Can be access-controlled |
 | Mitigations adequate | ✅ Yes | All risks manageable |
@@ -291,7 +291,7 @@ Run: snyk-agent-scan --mcp @playwright/mcp@0.0.79
 
 ---
 
-## Phase 5: Documentation & Restrictions
+## Phase 6: Documentation & Restrictions
 
 **Required Conditions:**
 1. ✅ Do NOT use `--allow-unrestricted-file-access` flag

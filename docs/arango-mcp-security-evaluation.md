@@ -19,7 +19,7 @@ mcp-server-arangodb is a TypeScript MCP server for ArangoDB database interaction
 
 ---
 
-## Phase 0: Immediate Rejection Criteria
+## Phase 1: Immediate Rejection Criteria
 
 | Criterion | Status | Finding |
 |-----------|--------|---------|
@@ -31,11 +31,11 @@ mcp-server-arangodb is a TypeScript MCP server for ArangoDB database interaction
 | Source code unavailable | ✅ PASS | Public GitHub repository |
 | Project abandonment (2+ years) | ✅ PASS | Recent commits (Feb 2026) |
 
-**Phase 0 Result:** ✅ **PASS** — No immediate rejection criteria found.
+**Phase 1 Result:** ✅ **PASS** — No immediate rejection criteria found.
 
 ---
 
-## Phase 1: Quick Scan (30 minutes)
+## Phase 2: Quick Scan (30 minutes)
 
 ### 1.1 Project Purpose & Permissions
 
@@ -81,11 +81,11 @@ mcp-server-arangodb
 | Network requests (unvalidated) | Only ArangoDB server | ✅ SAFE |
 | SQL/AQL injection patterns | Potential risk | ⚠️ REVIEW |
 
-**Phase 1 Result:** ✅ **PASS** — Proceed to Phase 2
+**Phase 2 Result:** ✅ **PASS** — Proceed to Phase 3
 
 ---
 
-## Phase 2: Medium Dive (2 hours)
+## Phase 3: Medium Dive (2 hours)
 
 ### 2.1 AQL Query Execution Risk
 
@@ -175,13 +175,13 @@ mcp-server-arangodb
 
 ---
 
-## Phase 3: Deep Dive (Not Needed)
+## Phase 4: Deep Dive (Not Needed)
 
-Phase 2 identified medium-level risk (AQL injection) but no blockers. Risk is manageable with configuration controls and client-side validation.
+Phase 3 identified medium-level risk (AQL injection) but no blockers. Risk is manageable with configuration controls and client-side validation.
 
 ---
 
-## Phase 4: Decision
+## Phase 5: Make the Decision
 
 | Criteria | Result | Notes |
 |----------|--------|-------|
