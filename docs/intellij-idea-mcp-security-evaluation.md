@@ -16,7 +16,7 @@
 
 The JetBrains MCP Proxy Server is an official, well-maintained proxy that connects AI clients (Claude, VS Code, etc.) to JetBrains IDEs. The codebase is clean, minimal, and transparent. Primary functionality is a straightforward HTTP proxy with environment-based configuration. No significant security vulnerabilities identified.
 
-**Note:** This repository is deprecated as of IntelliJ IDEA 2025.2, with built-in MCP functionality now integrated directly into the IDE.
+**Note:** Repo is deprecated. Current implementation is built into IntelliJ IDEA 2025.2+ (closed source, part of proprietary IDE).
 
 ---
 
