@@ -20,7 +20,7 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 
 ---
 
-## Phase 1: Immediate Rejection Criteria
+## Phase 1
 
 **Stop evaluation if ANY found. Results:**
 
@@ -39,7 +39,7 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 
 ---
 
-## Phase 2: Quick Scan (30 minutes)
+## Phase 2
 
 ### Automated Security Scanners
 
@@ -60,7 +60,7 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 
 ---
 
-## Phase 3: Medium Dive (2 hours)
+## Phase 3
 
 ### Code & Dependencies Analysis
 
@@ -133,7 +133,7 @@ Playwright MCP is an official Microsoft project for browser automation via MCP. 
 
 ---
 
-## Phase 4: Deep Dive (Partial — Runtime Testing Needed)
+## Phase 4
 
 ### Detailed Code Analysis
 
@@ -181,7 +181,7 @@ Run: snyk-agent-scan --mcp @playwright/mcp@0.0.79
 
 ---
 
-## Phase 5: Make the Decision
+## Phase 5
 
 ### Attack Scenario 1: Malicious Page Execution
 **Attack:** MCP navigates to attacker page → Page executes JS → Accesses cookies/storage  

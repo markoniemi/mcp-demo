@@ -20,7 +20,7 @@ maven-mcp is a lightweight TypeScript MCP server for Maven Central artifact look
 
 ---
 
-## Phase 1: Immediate Rejection Criteria
+## Phase 1
 
 | Criterion | Status | Finding |
 |-----------|--------|---------|
@@ -36,7 +36,7 @@ maven-mcp is a lightweight TypeScript MCP server for Maven Central artifact look
 
 ---
 
-## Phase 2: Quick Scan (30 minutes)
+## Phase 2
 
 ### 1.1 Project Purpose & Permissions
 
@@ -90,7 +90,7 @@ maven-mcp@1.0.3
 
 ---
 
-## Phase 3: Medium Dive (2 hours)
+## Phase 3
 
 ### 2.1 Network Access & Maven Central API
 
@@ -178,13 +178,13 @@ maven-mcp@1.0.3
 
 ---
 
-## Phase 4: Deep Dive (Not Needed)
+## Phase 4
 
 Phase 3 found no concerns. Clean, minimal attack surface. No Phase 4 investigation needed.
 
 ---
 
-## Phase 5: Make the Decision
+## Phase 5
 
 | Criteria | Result | Notes |
 |----------|--------|-------|

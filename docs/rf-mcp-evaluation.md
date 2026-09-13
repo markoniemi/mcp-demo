@@ -21,7 +21,7 @@ rf-mcp is an actively maintained Robot Framework MCP server for test automation.
 
 ---
 
-## Phase 1: Immediate Rejection Criteria
+## Phase 1
 
 **Stop evaluation if ANY found. Results:**
 
@@ -40,7 +40,7 @@ rf-mcp is an actively maintained Robot Framework MCP server for test automation.
 
 ---
 
-## Phase 2: Quick Scan (30 minutes)
+## Phase 2
 
 ### Automated Security Scanners
 
@@ -63,7 +63,7 @@ rf-mcp is an actively maintained Robot Framework MCP server for test automation.
 
 ---
 
-## Phase 3: Medium Dive (2 hours)
+## Phase 3
 
 ### Code & Dependencies Analysis
 
@@ -143,7 +143,7 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 
 ---
 
-## Phase 4: Deep Dive (Partial — Runtime Testing Needed)
+## Phase 4
 
 ### Detailed Code Analysis
 
@@ -214,7 +214,7 @@ beautifulsoup4, lxml, python-dotenv, pyyaml, tomlkit
 
 ---
 
-## Phase 5: Make the Decision
+## Phase 5
 
 ### Attack Scenario 1: Malicious Test File Injection
 **Attack:** Inject Robot Framework code via test file that executes system commands  

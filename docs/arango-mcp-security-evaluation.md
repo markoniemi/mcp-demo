@@ -19,7 +19,7 @@ mcp-server-arangodb is a TypeScript MCP server for ArangoDB database interaction
 
 ---
 
-## Phase 1: Immediate Rejection Criteria
+## Phase 1
 
 | Criterion | Status | Finding |
 |-----------|--------|---------|
@@ -35,7 +35,7 @@ mcp-server-arangodb is a TypeScript MCP server for ArangoDB database interaction
 
 ---
 
-## Phase 2: Quick Scan (30 minutes)
+## Phase 2
 
 ### 1.1 Project Purpose & Permissions
 
@@ -85,7 +85,7 @@ mcp-server-arangodb
 
 ---
 
-## Phase 3: Medium Dive (2 hours)
+## Phase 3
 
 ### 2.1 AQL Query Execution Risk
 
@@ -175,13 +175,13 @@ mcp-server-arangodb
 
 ---
 
-## Phase 4: Deep Dive (Not Needed)
+## Phase 4
 
 Phase 3 identified medium-level risk (AQL injection) but no blockers. Risk is manageable with configuration controls and client-side validation.
 
 ---
 
-## Phase 5: Make the Decision
+## Phase 5
 
 | Criteria | Result | Notes |
 |----------|--------|-------|
@@ -196,7 +196,7 @@ Phase 3 identified medium-level risk (AQL injection) but no blockers. Risk is ma
 
 ---
 
-## Phase 5: Restrictions & Conditions
+## Phase 5 (continued)
 
 **Condition 1 — AQL Query Parameterization (MANDATORY):**
 - Require all AQL queries use parameterized binding (`:param` syntax)

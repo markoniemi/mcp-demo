@@ -20,7 +20,7 @@ The JetBrains MCP Proxy Server is an official, well-maintained proxy that connec
 
 ---
 
-## Phase 1: Immediate Rejection Criteria
+## Phase 1
 
 | Criterion | Status | Finding |
 |-----------|--------|---------|
@@ -36,7 +36,7 @@ The JetBrains MCP Proxy Server is an official, well-maintained proxy that connec
 
 ---
 
-## Phase 2: Quick Scan & Repository Analysis
+## Phase 2
 
 ### 2.1 Project Authority & Maintenance
 
@@ -94,7 +94,7 @@ README clearly states:
 
 ---
 
-## Phase 3: Deep Code Analysis
+## Phase 3
 
 ### 3.1 Dependency Security
 
@@ -223,7 +223,7 @@ async function testListTools(endpoint: string): Promise<boolean> {
 
 ---
 
-## Phase 4: Risk Assessment
+## Phase 4
 
 ### 4.1 Threat Model
 
@@ -275,7 +275,7 @@ async function testListTools(endpoint: string): Promise<boolean> {
 
 ---
 
-## Phase 5: Findings & Recommendations
+## Phase 5
 
 ### 5.1 Security Findings Summary
 
